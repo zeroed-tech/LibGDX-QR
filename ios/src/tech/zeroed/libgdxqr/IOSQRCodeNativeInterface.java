@@ -17,7 +17,8 @@ public class IOSQRCodeNativeInterface implements NativeInterface{
         UIViewController controller = ((IOSApplication)Gdx.app).getUIViewController();
         ScannerViewController scanner = new ScannerViewController();
         controller.addChildViewController(scanner);
-
+        controller.getView().addSubview(scanner.getView());
+        scanner.getView().setBounds(controller.getView().getBounds());
     }
 
     protected static class ScannerViewController extends UIViewController implements AVCaptureMetadataOutputObjectsDelegate {
@@ -28,7 +29,7 @@ public class IOSQRCodeNativeInterface implements NativeInterface{
         public void viewDidLoad() {
             super.viewDidLoad();
 
-            getView().setBackgroundColor(UIColor.black());
+            getView().setBackgroundColor(UIColor.red());
             captureSession = new AVCaptureSession();
             AVCaptureDevice videoCaptureDevice = AVCaptureDevice.getDefaultDeviceForMediaType(AVMediaType.Video);
             AVCaptureDeviceInput videoInput;
@@ -71,10 +72,16 @@ public class IOSQRCodeNativeInterface implements NativeInterface{
 
         private void failed(){
             QRCode.QRCodeScanned(false, "An error was encountered while setting up the scanner");
+            willMoveToParentViewController(null);
+            getView().removeFromSuperview();
+            removeFromParentViewController();
         }
 
         private void found(String code){
             QRCode.QRCodeScanned(true, code);
+            willMoveToParentViewController(null);
+            getView().removeFromSuperview();
+            removeFromParentViewController();
         }
 
         @Override

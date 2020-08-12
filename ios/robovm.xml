@@ -32,6 +32,7 @@
     <pattern>com.android.org.bouncycastle.crypto.digests.AndroidDigestFactoryOpenSSL</pattern>
     <pattern>org.apache.harmony.security.provider.cert.DRLCertFactory</pattern>
     <pattern>org.apache.harmony.security.provider.crypto.CryptoProvider</pattern>
+    <pattern>com.google.zxing.*</pattern>
   </forceLinkClasses>
   <libs>
       <lib>z</lib>   

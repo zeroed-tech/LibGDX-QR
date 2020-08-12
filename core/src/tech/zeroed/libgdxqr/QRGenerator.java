@@ -142,7 +142,8 @@ public class QRGenerator {
             texture.dispose();
 
             return new TextureRegion(fbo.getColorBufferTexture());
-        }catch (WriterException ignored){
+        }catch (Exception exception){
+            Gdx.app.error("QRGenerator", exception.getMessage(), exception);
         }
         return null;
     }

@@ -24,7 +24,7 @@ allprojects {
     ext {
         appName = "LibGDX-QR"
         gdxVersion = '1.9.10'
-        roboVMVersion = '2.3.8'
+        roboVMVersion = '2.3.10-SNAPSHOT'
         shapedrawerVersion = '2.3.0'
     }
 
@@ -74,14 +74,12 @@ project(":ios") {
     apply plugin: "java-library"
     apply plugin: "robovm"
 
-
     dependencies {
         implementation project(":core")
         api "com.mobidevelop.robovm:robovm-rt:$roboVMVersion"
         api "com.mobidevelop.robovm:robovm-cocoatouch:$roboVMVersion"
         api "com.badlogicgames.gdx:gdx-backend-robovm:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"
-        
     }
 }
 

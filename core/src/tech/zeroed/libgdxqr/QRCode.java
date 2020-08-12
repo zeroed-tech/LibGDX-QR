@@ -6,6 +6,7 @@ public class QRCode {
     // Contains references to system dependent implementations of functions
     private NativeInterface nativeInterface;
     private CodeScanned callback;
+    private boolean scanInProgress = false;
 
     private QRCode(NativeInterface nativeInterface) {
         this.nativeInterface = nativeInterface;
@@ -22,6 +23,9 @@ public class QRCode {
     public static void scanQRCode(CodeScanned callback){
         if(instance == null)
             throw new IllegalStateException("Please call init() with a native implementation before trying to use native features");
+        if(instance.scanInProgress)
+            return;
+        instance.scanInProgress = true;
         instance.callback = callback;
         instance.nativeInterface.scanQRCode();
     }
@@ -37,5 +41,6 @@ public class QRCode {
             instance.callback.OnCodeScanned(value);
         else
             instance.callback.OnCodeScanError(value);
+        instance.scanInProgress = false;
     }
 }

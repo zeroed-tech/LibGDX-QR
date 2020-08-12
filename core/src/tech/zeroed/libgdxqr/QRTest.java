@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import jdk.internal.jline.internal.TestAccessible;
 
 public class QRTest implements ApplicationListener, InputProcessor {
 
@@ -22,7 +23,9 @@ public class QRTest implements ApplicationListener, InputProcessor {
     public void create() {
         String input = "Zeroed";
         batch = new SpriteBatch();
+
         qrcodes = new TextureRegion[]{
+
                 // Generate a basic QR code
                 QRCode.CreateGenerator().blockSize(12).generate(input),
                 // Generate a QR code with arcs on the eye borders
@@ -40,6 +43,8 @@ public class QRTest implements ApplicationListener, InputProcessor {
                 QRCode.CreateGenerator().blockSize(12).borderSize(3).generate(input),
                 // Generate a larger QR code
                 QRCode.CreateGenerator().blockSize(20).generate(input),
+
+
 
         };
 

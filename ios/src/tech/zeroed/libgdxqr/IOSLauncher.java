@@ -9,6 +9,7 @@ import com.badlogic.gdx.backends.iosrobovm.IOSApplicationConfiguration;
 public class IOSLauncher extends IOSApplication.Delegate {
     @Override
     protected IOSApplication createApplication() {
+        QRCode.init(new IOSQRCodeNativeInterface());
         IOSApplicationConfiguration config = new IOSApplicationConfiguration();
         return new IOSApplication(new QRTest(), config);
     }
