@@ -11,8 +11,8 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.4.1'
-        classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.8'
-        
+        classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.9'
+
 
     }
 }
@@ -23,7 +23,7 @@ allprojects {
     version = '1.0'
     ext {
         appName = "LibGDX-QR"
-        gdxVersion = '1.9.10'
+        gdxVersion = '1.9.11'
         roboVMVersion = '2.3.10-SNAPSHOT'
         shapedrawerVersion = '2.3.0'
     }
@@ -88,7 +88,7 @@ project(":core") {
 
     dependencies {
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
-        implementation 'com.google.zxing:core:3.3.0'
-        implementation "space.earlygrey:shapedrawer:$shapedrawerVersion"
+        api 'com.google.zxing:core:3.3.0'
+        api "space.earlygrey:shapedrawer:$shapedrawerVersion"
     }
 }
