@@ -13,6 +13,7 @@ import org.robovm.apple.dispatch.DispatchQueue;
 import org.robovm.apple.foundation.NSArray;
 import org.robovm.apple.foundation.NSErrorException;
 import org.robovm.apple.uikit.*;
+import org.robovm.objc.Selector;
 
 import java.util.ArrayList;
 
@@ -72,6 +73,18 @@ public class IOSQRCodeNativeInterface implements NativeInterface{
 
             getView().getLayer().addSublayer(previewLayer);
 
+            UINavigationBar navBar =new UINavigationBar(new CGRect(0, 0, UIScreen.getMainScreen().getBounds().getWidth(), 44));
+            UINavigationItem navItem = new UINavigationItem("Scan a QR code");
+            UIBarButtonItem doneItem = new UIBarButtonItem(UIBarButtonSystemItem.Cancel, new UIBarButtonItem.OnClickListener() {
+                @Override
+                public void onClick(UIBarButtonItem uiBarButtonItem) {
+                    failed();
+                }
+            });
+            navItem.setLeftBarButtonItem(doneItem);
+            navBar.setItems(new NSArray<>(navItem), false);
+            getView().addSubview(navBar);
+
             captureSession.startRunning();
         }
 
@@ -129,16 +142,21 @@ public class IOSQRCodeNativeInterface implements NativeInterface{
         }
     }
 
+    /**
+     * Ported from https://github.com/gaebel/scanner-overlays
+     */
     private static class ScannerOverlayPreviewLayer extends AVCaptureVideoPreviewLayer {
         private double cornerLength = 30;
         private double lineWidth = 6;
 
         private UIColor lineColor = UIColor.white();
         private CALineCap lineCap = CALineCap.Round;
-        private CGSize maskSize = new CGSize(200, 200);
+        private CGSize maskSize = new CGSize(300, 300);
 
         public ScannerOverlayPreviewLayer(AVCaptureSession captureSession) {
             super(captureSession);
+            setCornerRadius(10);
+            setNeedsDisplay();
         }
 
         private CGRect getMaskContainer(){
@@ -149,9 +167,7 @@ public class IOSQRCodeNativeInterface implements NativeInterface{
         }
 
         private CGPoint offsetBy(CGPoint point, double x, double y){
-            point.setX(point.getX()+x);
-            point.setY(point.getY()+y);
-            return point;
+            return new CGPoint(point.getX()+x, point.getY()+y);
         }
 
         @Override
@@ -166,7 +182,7 @@ public class IOSQRCodeNativeInterface implements NativeInterface{
 
             CAShapeLayer maskLayer = new CAShapeLayer();
             maskLayer.setPath(path);
-            maskLayer.setFillColor(getBackgroundColor());
+            maskLayer.setFillColor(new UIColor(0,0,0,0.75).getCGColor());
             maskLayer.setFillRule(CAShapeFillRule.EvenOdd);
 
             addSublayer(maskLayer);
