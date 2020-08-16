@@ -1,5 +1,8 @@
 package tech.zeroed.libgdxqr;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
+
 public class QRCode {
     private static QRCode instance;
 
@@ -8,8 +11,34 @@ public class QRCode {
     private CodeScanned callback;
     private boolean scanInProgress = false;
 
+    // Static properties used to configure native scanners
+    // (this saves having to pass all config values through multiple constructors to get them to the native code)
+
+    // Width and height of the overlay window
+    public static int rectWidth, rectHeight;
+    // Color of the corners around the overlay window
+    public static int lineColor;
+    // Width of the line making up the corners around the overlay
+    public static float lineWidth;
+    // Length of the line making up each side of the corners around the overlay
+    public static float cornerLength;
+    // Radius of the overlay's corners and the line drawn over the top
+    public static float cornerRadius;
+    // Color of the overlay background around the window
+    public static int backgroundColor;
+
     private QRCode(NativeInterface nativeInterface) {
         this.nativeInterface = nativeInterface;
+        rectWidth = 300;
+        rectHeight = 300;
+        lineColor = Color.argb8888(1, 1, 1, 1);
+        backgroundColor = Color.argb8888(0.75f, 0, 0, 0);
+        lineWidth = 5;
+        cornerLength = 40;
+        cornerRadius = 30;
+    }
+
+    public static void init(){
     }
 
     public static void init(NativeInterface nativeInterface){

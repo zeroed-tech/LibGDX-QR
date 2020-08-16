@@ -2,8 +2,6 @@ package tech.zeroed.libgdxqr;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.iosrobovm.IOSApplication;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.utils.Array;
 import org.robovm.apple.avfoundation.*;
 import org.robovm.apple.coreanimation.CALineCap;
 import org.robovm.apple.coreanimation.CAShapeFillRule;
@@ -13,7 +11,6 @@ import org.robovm.apple.dispatch.DispatchQueue;
 import org.robovm.apple.foundation.NSArray;
 import org.robovm.apple.foundation.NSErrorException;
 import org.robovm.apple.uikit.*;
-import org.robovm.objc.Selector;
 
 import java.util.ArrayList;
 
@@ -43,14 +40,14 @@ public class IOSQRCodeNativeInterface implements NativeInterface{
                 videoInput = new AVCaptureDeviceInput(videoCaptureDevice);
             } catch (NSErrorException e) {
                 e.printStackTrace();
-                failed();
+                failed("An error was encountered while setting up the scanner");
                 return;
             }
 
             if(captureSession.canAddInput(videoInput)){
                 captureSession.addInput(videoInput);
             }else{
-                failed();
+                failed("An error was encountered while setting up the scanner");
                 return;
             }
             AVCaptureMetadataOutput metadataOutput = new AVCaptureMetadataOutput();
@@ -63,7 +60,7 @@ public class IOSQRCodeNativeInterface implements NativeInterface{
                 objectTypes.add(AVMetadataObjectType.QRCode);
                 metadataOutput.setMetadataObjectTypes(objectTypes);
             }else{
-                failed();
+                failed("An error was encountered while setting up the scanner");
                 return;
             }
 
@@ -78,7 +75,7 @@ public class IOSQRCodeNativeInterface implements NativeInterface{
             UIBarButtonItem doneItem = new UIBarButtonItem(UIBarButtonSystemItem.Cancel, new UIBarButtonItem.OnClickListener() {
                 @Override
                 public void onClick(UIBarButtonItem uiBarButtonItem) {
-                    failed();
+                    failed("User cancelled scan");
                 }
             });
             navItem.setLeftBarButtonItem(doneItem);
@@ -88,8 +85,8 @@ public class IOSQRCodeNativeInterface implements NativeInterface{
             captureSession.startRunning();
         }
 
-        private void failed(){
-            QRCode.QRCodeScanned(false, "An error was encountered while setting up the scanner");
+        private void failed(String reason){
+            QRCode.QRCodeScanned(false, reason);
             willMoveToParentViewController(null);
             getView().removeFromSuperview();
             removeFromParentViewController();
