@@ -40,7 +40,7 @@ allprojects {
 }
 
 project(":android") {
-    apply plugin: "java-library"
+    apply plugin: "android"
 
     configurations { natives }
 
@@ -62,6 +62,7 @@ project(":android") {
 
 project(":ios") {
     apply plugin: "java-library"
+    apply plugin: "robovm"
 
     dependencies {
         implementation project(":core")
