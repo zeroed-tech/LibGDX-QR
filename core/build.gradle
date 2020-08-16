@@ -1,4 +1,8 @@
+apply plugin: "java"
 apply plugin: "java-library"
+apply plugin: 'maven'
+
+group='com.github.zeroed-tech'
 
 sourceCompatibility = 1.7
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'

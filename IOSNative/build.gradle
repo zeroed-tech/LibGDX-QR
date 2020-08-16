@@ -1,5 +1,8 @@
 apply plugin: "java-library"
 apply plugin: "robovm"
+apply plugin: 'maven'
+
+group='com.github.zeroed-tech'
 
 sourceSets.main.java.srcDirs = [ "src/" ]
 
