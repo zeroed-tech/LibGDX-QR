@@ -31,7 +31,7 @@ dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     api "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
     // Provides access to easy permission checking
-    implementation 'androidx.appcompat:appcompat:1.2.0'
+    api 'androidx.appcompat:appcompat:1.2.0'
     // Provides access to the vision API
-    implementation 'com.google.android.gms:play-services-vision:20.1.0'
+    api 'com.google.android.gms:play-services-vision:20.1.1'
 }
