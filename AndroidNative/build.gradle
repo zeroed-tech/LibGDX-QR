@@ -1,0 +1,37 @@
+apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
+
+group='com.github.zeroed-tech'
+
+android {
+    compileSdkVersion 30
+    buildToolsVersion "29.0.3"
+
+    defaultConfig {
+        minSdkVersion 16
+        targetSdkVersion 30
+        versionCode 1
+        versionName "1.0"
+
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+configurations { natives }
+
+dependencies {
+    implementation project(":core")
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+    api "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
+    // Provides access to easy permission checking
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    // Provides access to the vision API
+    implementation 'com.google.android.gms:play-services-vision:20.1.0'
+}

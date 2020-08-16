@@ -1,1 +1,4 @@
-include 'android', 'ios', 'core'
+include 'AndroidNative'
+include 'core'
+include 'IOSNative'
+

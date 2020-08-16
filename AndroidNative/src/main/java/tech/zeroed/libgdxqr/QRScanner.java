@@ -1,6 +1,7 @@
 package tech.zeroed.libgdxqr;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.*;
@@ -55,7 +56,7 @@ public class QRScanner extends AppCompatActivity implements ActivityCompat.OnReq
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         Intent result = new Intent();
         result.setData(Uri.parse("User cancelled scan"));
-        setResult(RESULT_CANCELED, result);
+        setResult(Activity.RESULT_CANCELED, result);
         finish();
         return super.onOptionsItemSelected(item);
     }
@@ -73,13 +74,13 @@ public class QRScanner extends AppCompatActivity implements ActivityCompat.OnReq
                     e.printStackTrace();
                     Intent result = new Intent();
                     result.setData(Uri.parse(e.getMessage()));
-                    setResult(RESULT_CANCELED, result);
+                    setResult(Activity.RESULT_CANCELED, result);
                     finish();
                 }
             }else{
                 Intent result = new Intent();
                 result.setData(Uri.parse("Permission denied"));
-                setResult(RESULT_CANCELED, result);
+                setResult(Activity.RESULT_CANCELED, result);
                 finish();
             }
         }
@@ -94,7 +95,7 @@ public class QRScanner extends AppCompatActivity implements ActivityCompat.OnReq
         if (barcodes.size() != 0) {
             Intent result = new Intent();
             result.setData(Uri.parse(barcodes.valueAt(0).displayValue));
-            setResult(RESULT_OK, result);
+            setResult(Activity.RESULT_OK, result);
             finish();
         }
     }
@@ -125,7 +126,7 @@ public class QRScanner extends AppCompatActivity implements ActivityCompat.OnReq
                 e.printStackTrace();
                 Intent result = new Intent();
                 result.setData(Uri.parse(e.getMessage()));
-                setResult(RESULT_CANCELED, result);
+                setResult(Activity.RESULT_CANCELED, result);
                 finish();
             }
         } else {

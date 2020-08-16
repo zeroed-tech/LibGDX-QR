@@ -1,4 +1,4 @@
-apply plugin: "java"
+apply plugin: "java-library"
 
 sourceCompatibility = 1.7
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
@@ -6,3 +6,9 @@ sourceCompatibility = 1.7
 sourceSets.main.java.srcDirs = [ "src/" ]
 
 eclipse.project.name = appName + "-core"
+
+dependencies {
+    api "com.badlogicgames.gdx:gdx:$gdxVersion"
+    api 'com.google.zxing:core:3.3.0'
+    api "space.earlygrey:shapedrawer:$shapedrawerVersion"
+}
