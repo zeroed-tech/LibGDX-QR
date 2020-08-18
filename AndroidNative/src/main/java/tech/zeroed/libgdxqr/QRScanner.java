@@ -4,12 +4,14 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.*;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcel;
+import android.util.Base64;
 import android.util.SparseArray;
-import android.view.*;
-import android.widget.LinearLayout;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -40,8 +42,6 @@ public class QRScanner extends AppCompatActivity implements ActivityCompat.OnReq
 
         root.addView(preview, new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         root.addView(new ScannerOverlay(this), new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-
-        //root.addView(new ScannerOverlay(this), new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
         setContentView(root, new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
     }
@@ -94,7 +94,10 @@ public class QRScanner extends AppCompatActivity implements ActivityCompat.OnReq
         final SparseArray<Barcode> barcodes = detections.getDetectedItems();
         if (barcodes.size() != 0) {
             Intent result = new Intent();
-            result.setData(Uri.parse(barcodes.valueAt(0).displayValue));
+
+            Barcode barcode = barcodes.valueAt(0);
+            result.putExtra("Barcode", barcode);
+
             setResult(Activity.RESULT_OK, result);
             finish();
         }

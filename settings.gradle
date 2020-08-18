@@ -1,3 +1,4 @@
+include ':test'
 include 'AndroidNative'
 include 'core'
 include 'IOSNative'

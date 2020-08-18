@@ -11,6 +11,9 @@ public class QRCode {
     private CodeScanned callback;
     private boolean scanInProgress = false;
 
+    // Change this to true to force the scanner to return a byte array rather than a string
+    public static boolean forceBinary = false;
+
     // Static properties used to configure native scanners
     // (this saves having to pass all config values through multiple constructors to get them to the native code)
 
@@ -70,6 +73,18 @@ public class QRCode {
             instance.callback.OnCodeScanned(value);
         else
             instance.callback.OnCodeScanError(value);
+        instance.scanInProgress = false;
+    }
+
+    public static void QRCodeScanned(byte[] value){
+        if(instance == null)
+            throw new IllegalStateException("Please call init() with a native implementation before trying to use native features");
+        if(instance.callback == null)
+            return;
+
+        // Call the appropriate callback
+        instance.callback.OnCodeScanned(value);
+
         instance.scanInProgress = false;
     }
 }
