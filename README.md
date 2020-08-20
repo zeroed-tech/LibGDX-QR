@@ -8,7 +8,7 @@ This library uses the QR generation functionality of the Zebra Crossing Barcode 
 Finally, the texture is extracted from the frame buffer and returned.
 
 ## Scanning
-Currently, Android and IOS support QR Code scanning (there is currently no intention of supporting GWT and Desktop).
+Currently, Android and IOS support QR Code scanning (there is no intention of supporting GWT and Desktop but feel free to do so yourself).
 
 ### Android
 QR scanning on Android is provided by Google's play-services-vision. LibGDX-QR creates a new Activity which implements all QR scanning functionality from this library and returns the first code scanned.
@@ -16,9 +16,9 @@ QR scanning on Android is provided by Google's play-services-vision. LibGDX-QR c
 ### IOS
 QR scanning on IOS is provided by Apple's native AVCapture libraries. LibGDX-QR creates a new View Controller which implements all QR scanning functionality and returns the first code scanned.
 
+### Known Limitations
+Currently, Binary QR codes are supported on Android but not IOS. As far as I can tell, IOS doesn't expose an API for accessing the data returned by non String based QR codes. 
 
-# Examples
-![Example](https://github.com/zeroed-tech/libgdx-QR/raw/master/Example.png)
 
 # Setup
 Add Jitpack if you don't already have it
@@ -60,20 +60,23 @@ Each platform has some extra things that need to be configured get things up and
 
 ### IOS
 * Add `QRCode.init(new IOSQRCodeNativeInterface());` to `IOSLauncher.java`
-* Add the following value to `info.plist`
+* Add the following value to `info.plist`. Feel free to change the text between `<string></string>`
 ```
 <key>NSCameraUsageDescription</key>
 <string>Needed to support QR code scanning</string>
 ```
 
+### Custom
+Do you want to support a platform that I haven't? Do you think my Android Activity or IOS View Controller looks horrible (I don't blame you)? Feel free to make your own!
+To do so simply implement `NativeInterface`, perform your QR scanning login and be sure to call `QRCode.QRCodeScanned(code);` when you're done.
 
 # Terminology
 I haven't read the QR spec so I've almost certainly gotten the terminology wrong in the code. Here is what I've referred to everything as:
 
 * Block - a single square of the QR code
-* Eye - the large (7x7) squares in the top left and right and the bottom left corners 
+* Eye - the large (7x7) squares in the top left, top right and bottom left corners 
 
-# Usage
+# Usage - Generation
 Start by creating a QRGenerator and specifying a block size (the number of pixels each square should take up:
 ```java
 QRGenerator generator = new QRGenerator(15)
@@ -138,3 +141,7 @@ new QRGenerator(12).borderSize(3).generate(input)
 // Generate a larger QR code
 new QRGenerator(20).generate(input)
 ```
+![Example](https://github.com/zeroed-tech/libgdx-QR/raw/master/Example.png)
+
+# Usage - Scanning
+After performing any necessary platform specific setup simply call `QRCode.scanQRCode(CodeScanned)` with a CodeScanned callback object and you're good to go
