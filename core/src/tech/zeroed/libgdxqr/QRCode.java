@@ -1,6 +1,5 @@
 package tech.zeroed.libgdxqr;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 
 public class QRCode {

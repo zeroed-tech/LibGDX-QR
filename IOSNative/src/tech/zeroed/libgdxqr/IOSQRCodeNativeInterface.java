@@ -14,10 +14,10 @@ import org.robovm.apple.uikit.*;
 
 import java.util.ArrayList;
 
-public class IOSQRCodeNativeInterface implements NativeInterface{
+public class IOSQRCodeNativeInterface implements NativeInterface {
     @Override
     public void scanQRCode() {
-        UIViewController controller = ((IOSApplication)Gdx.app).getUIViewController();
+        UIViewController controller = ((IOSApplication) Gdx.app).getUIViewController();
         ScannerViewController scanner = new ScannerViewController();
         controller.addChildViewController(scanner);
         controller.getView().addSubview(scanner.getView());
@@ -27,6 +27,7 @@ public class IOSQRCodeNativeInterface implements NativeInterface{
     protected static class ScannerViewController extends UIViewController implements AVCaptureMetadataOutputObjectsDelegate {
         private AVCaptureSession captureSession;
         private ScannerOverlayPreviewLayer previewLayer;
+        private UINavigationBar navBar;
 
         @Override
         public void viewDidLoad() {
@@ -70,7 +71,8 @@ public class IOSQRCodeNativeInterface implements NativeInterface{
 
             getView().getLayer().addSublayer(previewLayer);
 
-            UINavigationBar navBar =new UINavigationBar(new CGRect(0, 0, UIScreen.getMainScreen().getBounds().getWidth(), 44));
+            navBar = new UINavigationBar(new CGRect(0, 0, UIScreen.getMainScreen().getBounds().getWidth(), 44));
+            navBar.setAutoresizingMask(UIViewAutoresizing.FlexibleWidth);
             UINavigationItem navItem = new UINavigationItem("Scan a QR code");
             UIBarButtonItem doneItem = new UIBarButtonItem(UIBarButtonSystemItem.Cancel, new UIBarButtonItem.OnClickListener() {
                 @Override
@@ -99,11 +101,56 @@ public class IOSQRCodeNativeInterface implements NativeInterface{
             removeFromParentViewController();
         }
 
+        private void found(byte[] code){
+            QRCode.QRCodeScanned(code);
+            willMoveToParentViewController(null);
+            getView().removeFromSuperview();
+            removeFromParentViewController();
+        }
+
         @Override
         public void viewWillAppear(boolean animated) {
             super.viewWillAppear(animated);
             if(captureSession != null && !captureSession.isRunning()){
                 captureSession.startRunning();
+            }
+        }
+
+        private void updatePreviewLayer(AVCaptureConnection layer, AVCaptureVideoOrientation orientation) {
+            layer.setVideoOrientation(orientation);
+            previewLayer.setFrame(getView().getBounds());
+        }
+
+        @Override
+        public void viewDidLayoutSubviews() {
+            super.viewDidLayoutSubviews();
+
+            UIDevice currentDevice = UIDevice.getCurrentDevice();
+            UIDeviceOrientation orientation = currentDevice.getOrientation();
+            AVCaptureConnection connection = previewLayer.getConnection();
+
+            if(connection.supportsVideoOrientation()){
+                switch (orientation) {
+                    case Portrait: {
+                        updatePreviewLayer(connection, AVCaptureVideoOrientation.Portrait);
+                        break;
+                    }
+                    case PortraitUpsideDown: {
+                        updatePreviewLayer(connection, AVCaptureVideoOrientation.PortraitUpsideDown);
+                        break;
+                    }
+                    case LandscapeLeft: {
+                        updatePreviewLayer(connection, AVCaptureVideoOrientation.LandscapeRight);
+                        break;
+                    }
+                    case LandscapeRight: {
+                        updatePreviewLayer(connection, AVCaptureVideoOrientation.LandscapeLeft);
+                        break;
+                    }
+
+                    default: updatePreviewLayer(connection, AVCaptureVideoOrientation.Portrait);
+
+                }
             }
         }
 
@@ -116,13 +163,22 @@ public class IOSQRCodeNativeInterface implements NativeInterface{
         }
 
         @Override
+        public void viewWillTransitionToSize(CGSize cgSize, UIViewControllerTransitionCoordinator uiViewControllerTransitionCoordinator) {
+            super.viewWillTransitionToSize(cgSize, uiViewControllerTransitionCoordinator);
+
+            previewLayer.setFrame(new CGRect(new CGPoint(0,0), cgSize));
+            previewLayer.setVideoGravity(AVLayerVideoGravity.ResizeAspectFill);
+
+        }
+
+        @Override
         public boolean prefersStatusBarHidden() {
             return true;
         }
 
         @Override
         public UIInterfaceOrientationMask getSupportedInterfaceOrientations() {
-            return UIInterfaceOrientationMask.Portrait;
+            return UIInterfaceOrientationMask.All;
         }
 
         @Override
@@ -132,6 +188,16 @@ public class IOSQRCodeNativeInterface implements NativeInterface{
             if(metadataObject != null){
                 if(metadataObject instanceof AVMetadataMachineReadableCodeObject) {
                     AVMetadataMachineReadableCodeObject readableCodeObject = (AVMetadataMachineReadableCodeObject)metadataObject;
+
+                    // In theory this can be used to read binary QR codes but I couldn't get it to work
+//                    try {
+//                        CIQRCodeDescriptor descriptor = (CIQRCodeDescriptor) readableCodeObject.getDescriptor();
+//                        NSData codeData = descriptor.getErrorCorrectedPayload();
+//                        found(codeData.getBytes());
+//                        return;
+//                    }catch (Exception e) {
+//                    }
+
                     String scannedValue = readableCodeObject.getStringValue();
                     found(scannedValue);
                 }
@@ -143,17 +209,28 @@ public class IOSQRCodeNativeInterface implements NativeInterface{
      * Ported from https://github.com/gaebel/scanner-overlays
      */
     private static class ScannerOverlayPreviewLayer extends AVCaptureVideoPreviewLayer {
-        private double cornerLength = 30;
-        private double lineWidth = 6;
-
-        private UIColor lineColor = UIColor.white();
+        private double cornerLength = QRCode.cornerLength;
+        private double lineWidth = QRCode.lineWidth;
+        private UIColor lineColor = colorFromInt(QRCode.lineColor);
+        private UIColor backgroundColor = colorFromInt(QRCode.backgroundColor);
         private CALineCap lineCap = CALineCap.Round;
-        private CGSize maskSize = new CGSize(300, 300);
+        private CGSize maskSize = new CGSize(QRCode.rectWidth, QRCode.rectHeight);
+        private CAShapeLayer maskLayer;
+        private CAShapeLayer shapeLayer;
 
         public ScannerOverlayPreviewLayer(AVCaptureSession captureSession) {
             super(captureSession);
             setCornerRadius(10);
             setNeedsDisplay();
+            setNeedsDisplayOnBoundsChange(true);
+        }
+
+        private UIColor colorFromInt(int color){
+            double a = ((color & 0xff000000) >>> 24) / 255f;
+            double r = ((color & 0x00ff0000) >>> 16) / 255f;
+            double g = ((color & 0x0000ff00) >>> 8) / 255f;
+            double b = ((color & 0x000000ff)) / 255f;
+            return new UIColor(r, g, b, a);
         }
 
         private CGRect getMaskContainer(){
@@ -171,15 +248,23 @@ public class IOSQRCodeNativeInterface implements NativeInterface{
         public void draw(CGContext ctx) {
             super.draw(ctx);
 
+            if(maskLayer != null){
+                maskLayer.removeFromSuperlayer();
+            }
+
+            if(shapeLayer != null){
+                shapeLayer.removeFromSuperlayer();
+            }
+
             CGRect maskContainer = getMaskContainer();
 
             CGMutablePath path = CGMutablePath.createMutable();
             path.addRect(null, getBounds());
             path.addRoundedRect(null, maskContainer, getCornerRadius(), getCornerRadius());
 
-            CAShapeLayer maskLayer = new CAShapeLayer();
+            maskLayer = new CAShapeLayer();
             maskLayer.setPath(path);
-            maskLayer.setFillColor(new UIColor(0,0,0,0.75).getCGColor());
+            maskLayer.setFillColor(backgroundColor.getCGColor());
             maskLayer.setFillRule(CAShapeFillRule.EvenOdd);
 
             addSublayer(maskLayer);
@@ -222,7 +307,7 @@ public class IOSQRCodeNativeInterface implements NativeInterface{
             combinedPath.addPath(null, lowerRightCorner.getCGPath());
             combinedPath.addPath(null, bottomLeftCorner.getCGPath());
 
-            CAShapeLayer shapeLayer = new CAShapeLayer();
+            shapeLayer = new CAShapeLayer();
             shapeLayer.setPath(combinedPath);
             shapeLayer.setStrokeColor(lineColor.getCGColor());
             shapeLayer.setFillColor(UIColor.clear().getCGColor());

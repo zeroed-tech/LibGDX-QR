@@ -58,6 +58,14 @@ Each platform has some extra things that need to be configured get things up and
 * Change the value of `minSdkVersion` to 16 or higher in `android/build.gradle`
 * Add `QRCode.init(new AndroidQRCodeNativeInterface(this));` to `AndroidLauncher.java`
 
+### IOS
+* Add `QRCode.init(new IOSQRCodeNativeInterface());` to `IOSLauncher.java`
+* Add the following value to `info.plist`
+```
+<key>NSCameraUsageDescription</key>
+<string>Needed to support QR code scanning</string>
+```
+
 
 # Terminology
 I haven't read the QR spec so I've almost certainly gotten the terminology wrong in the code. Here is what I've referred to everything as:
