@@ -159,8 +159,12 @@ public class QRGenerator {
             // Finish rendering to the frame buffer
             fbo.end();
 
+            Texture result = new Texture(extractedTexture);
+            // Free the pixmap
+            extractedTexture.dispose();
+
             // Return the frame buffer
-            return new TextureRegion(new Texture(extractedTexture));
+            return new TextureRegion(result);
         }catch (Exception exception){
             Gdx.app.error("QRGenerator", exception.getMessage(), exception);
         }finally {
