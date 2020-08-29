@@ -57,6 +57,11 @@ Each platform has some extra things that need to be configured get things up and
 ### Android
 * Change the value of `minSdkVersion` to 16 or higher in `android/build.gradle`
 * Add `QRCode.init(new AndroidQRCodeNativeInterface(this));` to `AndroidLauncher.java`
+* Add the following to your `AndroidManifest.xml`
+```
+<uses-permission android:name="android.permission.CAMERA"/>
+<uses-feature android:name="android.hardware.camera" />
+```
 
 ### IOS
 * Add `QRCode.init(new IOSQRCodeNativeInterface());` to `IOSLauncher.java`
