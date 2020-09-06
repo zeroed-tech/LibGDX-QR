@@ -2,6 +2,11 @@
 
 LibGDX-QR provides you users with both QR Code generation and QR Code scanning by wrapping several external libraries and native OS APIs.
 
+## Demo
+A demo application is available [here](https://github.com/zeroed-tech/LibGDX-QR-Demo)
+
+It is also available on the Google Play Store [here]()
+
 ## Generation
 This library uses the QR generation functionality of the Zebra Crossing Barcode library https://github.com/zxing/zxing to generate a bit matrix representing a code then uses https://github.com/earlygrey/shapedrawer to render the QR code to a framebuffer.
 
@@ -150,3 +155,5 @@ new QRGenerator(20).generate(input)
 
 # Usage - Scanning
 After performing any necessary platform specific setup simply call `QRCode.scanQRCode(CodeScanned)` with a CodeScanned callback object and you're good to go
+
+[Here]: https://github.com/zeroed-tech/LibGDX-QR-Demo

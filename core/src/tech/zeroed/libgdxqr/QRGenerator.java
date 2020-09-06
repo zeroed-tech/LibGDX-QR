@@ -8,10 +8,15 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
+import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import space.earlygrey.shapedrawer.ShapeDrawer;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class QRGenerator {
     public enum Shape {
@@ -29,6 +34,9 @@ public class QRGenerator {
     private Shape eyeBorder;
     private Shape eyeInner;
     private Shape inner;
+
+    private ErrorCorrectionLevel correctionLevel = ErrorCorrectionLevel.L;
+    private int quietZone = 4;
 
     protected QRGenerator(){
         this.blockSize = 5;
@@ -76,6 +84,26 @@ public class QRGenerator {
         return this;
     }
 
+    /**
+     * Set the correction level used when generating the qr code
+     * @param correctionLevel
+     * @return
+     */
+    public QRGenerator setCorrectionLevel(ErrorCorrectionLevel correctionLevel){
+        this.correctionLevel = correctionLevel;
+        return this;
+    }
+
+    /**
+     * Set the quiet zone (margin) around the qr code
+     * @param quietZone
+     * @return
+     */
+    public QRGenerator setQuietZone(int quietZone){
+        this.quietZone = quietZone;
+        return this;
+    }
+
     public TextureRegion generate(String text) {
         BitMatrix bitMatrix;
 
@@ -87,7 +115,10 @@ public class QRGenerator {
         try {
             // Build a QR encoder and encode the requested text into a bitmatrix
             QRCodeWriter qrCodeWriter = new QRCodeWriter();
-            bitMatrix = qrCodeWriter.encode(text, BarcodeFormat.QR_CODE, 0, 0);
+            Map<EncodeHintType, Object> hints = new HashMap<>();
+            hints.put(EncodeHintType.ERROR_CORRECTION, correctionLevel);
+            hints.put(EncodeHintType.MARGIN, quietZone);
+            bitMatrix = qrCodeWriter.encode(text, BarcodeFormat.QR_CODE, 0, 0, hints);
 
             // Extract the co-ords of the QR code within the bitmatrix
             int[] enclosingRect = bitMatrix.getEnclosingRectangle();
