@@ -236,7 +236,7 @@ public class QRGenerator {
                 break;
             case SQUARE:
                 drawSquare(drawer, x, y, 6, 1); // Top
-                drawSquare(drawer, x+6, y, 1, 6); // Right
+                drawSquare(drawer, x+6, y, 1, 7); // Right
                 drawSquare(drawer, x, y+6, 6, 1); // Bottom
                 drawSquare(drawer, x, y+1, 1, 5); // Left
                 break;
