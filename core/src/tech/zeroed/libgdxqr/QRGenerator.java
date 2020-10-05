@@ -235,10 +235,10 @@ public class QRGenerator {
 
                 break;
             case SQUARE:
-                drawSquare(drawer, x, y, 7, 1);
-                drawSquare(drawer, x, y+6, 7, 1);
-                drawSquare(drawer, x, y, 1, 7);
-                drawSquare(drawer, x+6, y, 1, 7);
+                drawSquare(drawer, x, y, 6, 1); // Top
+                drawSquare(drawer, x+7, y, 1, 5); // Right
+                drawSquare(drawer, x, y+6, 6, 1); // Bottom
+                drawSquare(drawer, x, y+1, 1, 5); // Left
                 break;
             case ARC:
                 drawSquare(drawer, x+1, y, 5, 1);
