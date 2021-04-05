@@ -11,7 +11,7 @@ buildscript {
     dependencies {
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
         classpath 'com.android.tools.build:gradle:3.4.3'
-        classpath "com.mobidevelop.robovm:robovm-gradle-plugin:2.3.10-SNAPSHOT"
+        classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.8'
     }
 }
 
@@ -21,8 +21,8 @@ allprojects {
     version = '1.0'
     ext {
         appName = "LibGDX-QR"
-        gdxVersion = '1.9.11'
-        roboVMVersion = '2.3.10-SNAPSHOT'
+        gdxVersion = '1.9.12'
+        roboVMVersion = '2.3.9'
         shapedrawerVersion = '2.3.0'
     }
 

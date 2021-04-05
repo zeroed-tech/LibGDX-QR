@@ -15,6 +15,7 @@ import org.robovm.apple.uikit.*;
 import java.util.ArrayList;
 
 public class IOSQRCodeNativeInterface implements NativeInterface {
+
     @Override
     public void scanQRCode() {
         UIViewController controller = ((IOSApplication) Gdx.app).getUIViewController();
@@ -28,10 +29,27 @@ public class IOSQRCodeNativeInterface implements NativeInterface {
         private AVCaptureSession captureSession;
         private ScannerOverlayPreviewLayer previewLayer;
         private UINavigationBar navBar;
+        private boolean setupValid = false;
 
         @Override
         public void viewDidLoad() {
             super.viewDidLoad();
+            setupValid = true;
+            AVAuthorizationStatus permissionStatus = AVCaptureDevice.getAuthorizationStatusForMediaType(AVMediaType.Video);
+            switch (permissionStatus){
+                case NotDetermined:
+                    break;
+                case Restricted:
+                    setupValid = false;
+                    failed("Access to this devices camera has been restricted.\nQR scanning disabled");
+                    return;
+                case Denied:
+                    setupValid = false;
+                    failed("Camera permission denied, please enable the camera permission in the Settings application.\nQR scanning disabled");
+                    return;
+                case Authorized:
+                    break;
+            }
 
             getView().setBackgroundColor(UIColor.black());
             captureSession = new AVCaptureSession();
@@ -40,14 +58,16 @@ public class IOSQRCodeNativeInterface implements NativeInterface {
             try{
                 videoInput = new AVCaptureDeviceInput(videoCaptureDevice);
             } catch (NSErrorException e) {
+                setupValid = false;
                 e.printStackTrace();
-                failed("An error was encountered while setting up the scanner");
+                failed(e.getMessage());
                 return;
             }
 
             if(captureSession.canAddInput(videoInput)){
                 captureSession.addInput(videoInput);
             }else{
+                setupValid = false;
                 failed("An error was encountered while setting up the scanner");
                 return;
             }
@@ -61,6 +81,7 @@ public class IOSQRCodeNativeInterface implements NativeInterface {
                 objectTypes.add(AVMetadataObjectType.QRCode);
                 metadataOutput.setMetadataObjectTypes(objectTypes);
             }else{
+                setupValid = false;
                 failed("An error was encountered while setting up the scanner");
                 return;
             }
@@ -89,20 +110,20 @@ public class IOSQRCodeNativeInterface implements NativeInterface {
 
         private void failed(String reason){
             QRCode.QRCodeScanned(false, reason);
-            willMoveToParentViewController(null);
-            getView().removeFromSuperview();
-            removeFromParentViewController();
+            removeView();
         }
 
         private void found(String code){
             QRCode.QRCodeScanned(true, code);
-            willMoveToParentViewController(null);
-            getView().removeFromSuperview();
-            removeFromParentViewController();
+            removeView();
         }
 
         private void found(byte[] code){
             QRCode.QRCodeScanned(code);
+            removeView();
+        }
+
+        private void removeView(){
             willMoveToParentViewController(null);
             getView().removeFromSuperview();
             removeFromParentViewController();
@@ -111,6 +132,10 @@ public class IOSQRCodeNativeInterface implements NativeInterface {
         @Override
         public void viewWillAppear(boolean animated) {
             super.viewWillAppear(animated);
+            if(!setupValid){
+                removeView();
+                return;
+            }
             if(captureSession != null && !captureSession.isRunning()){
                 captureSession.startRunning();
             }
@@ -124,7 +149,15 @@ public class IOSQRCodeNativeInterface implements NativeInterface {
         @Override
         public void viewDidLayoutSubviews() {
             super.viewDidLayoutSubviews();
+            if(!setupValid){
+                removeView();
+                return;
+            }
 
+            setRotation();
+        }
+
+        private void setRotation(){
             UIDevice currentDevice = UIDevice.getCurrentDevice();
             UIDeviceOrientation orientation = currentDevice.getOrientation();
             AVCaptureConnection connection = previewLayer.getConnection();
@@ -168,7 +201,7 @@ public class IOSQRCodeNativeInterface implements NativeInterface {
 
             previewLayer.setFrame(new CGRect(new CGPoint(0,0), cgSize));
             previewLayer.setVideoGravity(AVLayerVideoGravity.ResizeAspectFill);
-
+            setRotation();
         }
 
         @Override
@@ -188,15 +221,6 @@ public class IOSQRCodeNativeInterface implements NativeInterface {
             if(metadataObject != null){
                 if(metadataObject instanceof AVMetadataMachineReadableCodeObject) {
                     AVMetadataMachineReadableCodeObject readableCodeObject = (AVMetadataMachineReadableCodeObject)metadataObject;
-
-                    // In theory this can be used to read binary QR codes but I couldn't get it to work
-//                    try {
-//                        CIQRCodeDescriptor descriptor = (CIQRCodeDescriptor) readableCodeObject.getDescriptor();
-//                        NSData codeData = descriptor.getErrorCorrectedPayload();
-//                        found(codeData.getBytes());
-//                        return;
-//                    }catch (Exception e) {
-//                    }
 
                     String scannedValue = readableCodeObject.getStringValue();
                     found(scannedValue);
